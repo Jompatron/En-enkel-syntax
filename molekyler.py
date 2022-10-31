@@ -61,41 +61,24 @@ class LinkedQ:
 class Grammatikfel(Exception):
     pass
 
+
 def readMolekyl(q):
-    if q.size == 2:
-        readLETTER(q)
+    readAtom(q)
+    if q.peek == ".":
         q.dequeue()
-
-    elif q.size == 3:
-        readLETTER(q)
-        if q.peek() in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']:
-            readLetter(q)
-
-        elif q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+        print("hej")
+    elif q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+        while q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
             readNum(q)
-
     else:
-        readLETTER(q)
-        if q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-            while q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                readNum(q)
-            if q.peek() == ".":
-                q.dequeue()
-        else:
-            readLetter(q)
-            readNum(q)
-            while q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-                readNum(q)
-
-            if q.peek() == ".":
-                q.dequeue()
+        readMolekyl(q)
 
 
 def readAtom(q):
     readLETTER(q)
-    readLetter(q)
-    readNum(q)
+    if q.peek in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                  'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']:
+        readLetter(q)
 
 
 def readLETTER(q):
