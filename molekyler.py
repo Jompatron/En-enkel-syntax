@@ -62,43 +62,68 @@ class Grammatikfel(Exception):
     pass
 
 def readMolekyl(q):
-    readAtom(q)
-    if q.peek() == ".":
+    if q.size == 2:
+        readLETTER(q)
         q.dequeue()
+
+    elif q.size == 3:
+        readLETTER(q)
+        if q.peek() in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']:
+            readLetter(q)
+
+        elif q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+            readNum(q)
+
     else:
         readLETTER(q)
-        readLetter(q)
+        if q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+            while q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                readNum(q)
+            if q.peek() == ".":
+                q.dequeue()
+        else:
+            readLetter(q)
+            readNum(q)
+            while q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                readNum(q)
+
+            if q.peek() == ".":
+                q.dequeue()
+
 
 def readAtom(q):
     readLETTER(q)
     readLetter(q)
     readNum(q)
 
+
 def readLETTER(q):
     word = q.dequeue()
-    if word == "[A-Z]": #reguljärt uttryck?
+    if word in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']:
         return
-    raise Grammatikfel("Fel stor bokstav: " + word)
+    raise Grammatikfel("Saknad stor bokstav vid radslutet")
 
 def readLetter(q):
     word = q.dequeue()
-    if word == "[a-z]": #reguljärt uttryck?
+    if word in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']:
         return
-    raise Grammatikfel("Fel liten bokstav: " + word)
+    raise Grammatikfel("Fel: Ska följa med liten bokstav: " + word)
 
 def readNum(q):
     word = q.dequeue()
-    if word == "[0-9]":  #reguljärt uttryck?
+    if word in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:  #reguljärt uttryck?
         return
-    raise Grammatikfel("Fel siffra: " + word)
+    raise Grammatikfel("För litet tal vid radslutet" + word)
 
 # Lägger in molekyl"delarna" i kön
 def storeMolekyl(molekyl):
     q = LinkedQ()
-    string = molekyl
 
-    for letter in string:
-        print(letter) # Bara för att kunna kolla i framtiden
+    for letter in molekyl:
+        #print(letter) # Bara för att kunna kolla i framtiden
         q.enqueue(letter)
     q.enqueue(".")
     return q
@@ -111,14 +136,17 @@ def kollaGrammatiken(molekyl):
         readMolekyl(q)
         return "Följer syntaxen!"
     except Grammatikfel as fel:
-        return str(fel) + " före " + str(q)
+        return str(fel) + str(q)
 
 
 def main():
     q = LinkedQ()
-    molekyl = input("Skriv en molekyl: ")
-    resultat = kollaGrammatiken(molekyl)
-    print(resultat)
+    molekyl = input()
+    while molekyl != "#":
+        resultat = kollaGrammatiken(molekyl)
+        print(resultat + " " + molekyl)
+        molekyl = input()
+
 
 if __name__ == '__main__':
     main()
