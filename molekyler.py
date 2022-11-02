@@ -1,4 +1,3 @@
-import re
 # Syntax:
 #< molekyl >: := < atom > | < atom > < num >
 #< atom >: := < LETTER > | < LETTER > < letter >
@@ -57,9 +56,10 @@ class LinkedQ:
         else:
             return None
 
-# Är det såhär man ska göra på punkt 3?
+
 class Grammatikfel(Exception):
     pass
+
 
 
 def readMolekyl(q):
@@ -67,8 +67,17 @@ def readMolekyl(q):
     if q.peek() == ".":
         q.dequeue()
     elif q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-        while q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-            readNum(q)
+        if q.peek() == "0":
+            q.dequeue()
+            raise Grammatikfel("För litet tal vid radslut")
+        elif q.peek() == "1":
+            first = q.dequeue()
+            second = q.peek()
+            if second in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                while q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                    readNum(q)
+            else:
+                raise Grammatikfel("För litet tal vid radslutet")
     else:
         readMolekyl(q)
 
@@ -96,21 +105,21 @@ def readLetter(q):
                 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']:
         q.dequeue()
         return
-    raise Grammatikfel("Fel: Ska följa med liten bokstav: " + word)
+    raise Grammatikfel("Fel: Ska följa med liten bokstav: ")
 
 
 def readNum(q):
     word = q.dequeue()
-    if word in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:  #reguljärt uttryck?
+    if word in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
         return
-    raise Grammatikfel("För litet tal vid radslutet" + word)
+    raise Grammatikfel("För litet tal vid radslutet")
 
-# Lägger in molekyl"delarna" i kön
+
 def storeMolekyl(molekyl):
     q = LinkedQ()
 
     for letter in molekyl:
-        #print(letter) # Bara för att kunna kolla i framtiden
+
         q.enqueue(letter)
     q.enqueue(".")
     return q
@@ -121,9 +130,12 @@ def kollaGrammatiken(molekyl):
 
     try:
         readMolekyl(q)
-        return "Följer syntaxen!"
+        return print("Formeln är syntaktiskt korrekt")
     except Grammatikfel as fel:
-        return str(fel) + str(q)
+        if str(fel) in ["Saknad stor bokstav vid radslutet"]:
+            print(fel, molekyl)
+        else:
+            print(fel)
 
 
 def main():
@@ -131,7 +143,6 @@ def main():
     molekyl = input()
     while molekyl != "#":
         resultat = kollaGrammatiken(molekyl)
-        print(resultat + " " + molekyl)
         molekyl = input()
 
 
