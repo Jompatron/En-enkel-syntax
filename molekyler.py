@@ -64,9 +64,8 @@ class Grammatikfel(Exception):
 
 def readMolekyl(q):
     readAtom(q)
-    if q.peek == ".":
+    if q.peek() == ".":
         q.dequeue()
-        print("hej")
     elif q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
         while q.peek() in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
             readNum(q)
@@ -76,24 +75,29 @@ def readMolekyl(q):
 
 def readAtom(q):
     readLETTER(q)
-    if q.peek in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-                  'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']:
+    if q.peek() in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']:
         readLetter(q)
 
 
+
 def readLETTER(q):
-    word = q.dequeue()
+    word = q.peek()
     if word in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
                 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']:
+        q.dequeue()
         return
     raise Grammatikfel("Saknad stor bokstav vid radslutet")
 
+
 def readLetter(q):
-    word = q.dequeue()
+    word = q.peek()
     if word in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
                 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']:
+        q.dequeue()
         return
     raise Grammatikfel("Fel: Ska följa med liten bokstav: " + word)
+
 
 def readNum(q):
     word = q.dequeue()
