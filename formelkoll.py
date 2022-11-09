@@ -1,3 +1,4 @@
+import string
 # Syntax:
 #<formel>::= <mol> \n
 #<mol>   ::= <group> | <group><mol>
@@ -86,8 +87,7 @@ class Stack:
         self.size = self.size + 1
 
     def remove(self):
-        last = self.stack[(len(self.stack))]
-        self.stack.remove(len(self.stack))
+        last = self.stack.pop()
         self.size = self.size - 1
         return last
 
@@ -97,26 +97,24 @@ class Grammatikfel(Exception):
 
 
 def readMolekyl(q, z):
-    print("readm " + q.peek())
     readGroup(q, z)
     if q.peek() == ".":
         return
     elif q.peek() == ")":
-        print(z.size)
         if z.size < 1:
             raise Grammatikfel("Felaktig gruppstart vid radslutet")
-        return
+        else:
+            return
     else:
         readMolekyl(q, z)
 
 
 def readGroup(q, z):
-    print(q.peek())
     if q.peek() == ".":
         raise Grammatikfel("Felaktig gruppstart vid radslutet")
     elif q.peek() in number:
         raise Grammatikfel("Felaktig gruppstart vid radslutet")
-    elif q.peek() in big:
+    elif q.peek().isalpha():
         readAtom(q)
         if q.peek() == ".":
             return
@@ -127,8 +125,8 @@ def readGroup(q, z):
     elif q.peek() == "(":
         z.store(q.dequeue())
         readMolekyl(q, z)
-        if q.peek() == ")":
-            raise Grammatikfel("Saknad högerparantes vid radslutet")
+        if q.peek() != ")":
+            raise Grammatikfel("Saknad högerparentes vid radslutet")
         if q.peek() == ".":
             raise Grammatikfel("Saknad siffra vid radslutet")
         else:
@@ -140,6 +138,7 @@ def readGroup(q, z):
     else:
         raise Grammatikfel("Felaktig gruppstart vid radslutet")
 
+
 def readAtom(q):
     if q.peek() in period:
         first = q.dequeue()
@@ -149,14 +148,22 @@ def readAtom(q):
                 if q.peek() in number:
                     readNum(q)
             else:
+                q.dequeue()
                 raise Grammatikfel("Okänd atom vid radslutet ")
         elif q.peek() in number:
             readNum(q)
+        else:
+            return
+    elif q.peek() in small:
+        raise Grammatikfel("Saknad stor bokstav vid radslutet")
     else:
         first = q.dequeue()
         if first + q.peek() in period:
             readLetter(q)
         elif first in small:
+            raise Grammatikfel("Saknad stor bokstav vid radslutet")
+        elif q.peek() in small:
+            q.dequeue()
             raise Grammatikfel("Saknad stor bokstav vid radslutet")
         else:
             raise Grammatikfel("Okänd atom vid radslutet")
@@ -208,12 +215,16 @@ def kollaGrammatiken(molekyl):
         readMolekyl(q, z)
         return "Formeln är syntaktiskt korrekt"
     except Grammatikfel as fel:
-        if str(fel) == "Saknad stor bokstav vid radslutet":
-            return str(fel) + " " + molekyl[:len(molekyl)-1]
-        elif molekyl[1] in small:
-            return str(fel) + " " + molekyl[3:len(molekyl)-1]
-        else:
-            return str(fel) + " " + molekyl[2:len(molekyl)-1]
+        return str(fel) + printRest(q)
+
+
+def printRest(q):
+    rest = " "
+    while not q.isEmpty():
+        sak = q.dequeue()
+        if sak != ".":
+            rest = rest + sak
+    return rest
 
 
 def main():
